@@ -25,6 +25,7 @@ function App() {
     fetchRequests();
   }, []);
    
+  //CREATE
   const handleSubmit = (e) =>{
     e.preventDefault();
 
@@ -33,6 +34,7 @@ function App() {
       helpType : helpType,
       status : "Pending"
     };
+
     fetch("http://localhost:8081/requests", {
       method : "POST",
       headers : {
@@ -49,6 +51,17 @@ function App() {
     })
     .catch((error)=>{
       console.error("Error creating requests : ", error);
+    });
+  };
+
+  //UPDATE
+  const markAsCompleted = (id) =>{
+    fetch(`http://localhost:8081/requests/${id}/complete`,{method: "PUT",})
+    .then(()=>{
+      fetchRequests(); //reload list after update
+    })
+    .catch((error)=>{
+      console.error("Error completing request:", error);
     });
   };
 
@@ -73,7 +86,12 @@ function App() {
         <ul>
           {requests.map((req)=> ( //loop over array, show each helpRequest on page
             <li key={req.id}>
-              <strong>{req.name}</strong> - {req.helpType} - {req.status}
+              <strong>{req.name}</strong> - {req.helpType} - {req.status}{" "}
+              {req.status !== "Completed" && (
+                <button onClick={()=> markAsCompleted(req.id)}>
+                  Mark As Completed
+                </button>
+              )}
             </li>
           ))}
         </ul>
