@@ -65,6 +65,17 @@ function App() {
     });
   };
 
+  //DELETE
+  const deleteRequest = (id) => {
+    fetch(`http://localhost:8081/requests/${id}`, {method: "DELETE",}) //calls backend endpoint
+    .then(()=>{
+      fetchRequests(); //reload after delete
+    })
+    .catch((error)=>{
+      console.error("Error deleting request: ", error);
+    });
+  };
+
   return(
     <div>
       <h1>Guardian Link</h1>
@@ -87,11 +98,14 @@ function App() {
           {requests.map((req)=> ( //loop over array, show each helpRequest on page
             <li key={req.id}>
               <strong>{req.name}</strong> - {req.helpType} - {req.status}{" "}
-              {req.status !== "Completed" && (
+              {req.status !== "Completed" && ( //show button only if status not completed
                 <button onClick={()=> markAsCompleted(req.id)}>
                   Mark As Completed
                 </button>
-              )}
+              )}{" "}
+              <button onClick={()=>deleteRequest(req.id)}>
+                Delete
+              </button>
             </li>
           ))}
         </ul>
