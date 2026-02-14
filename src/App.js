@@ -6,12 +6,14 @@ function App() {
   const [requests, setRequests] = useState([]); //will hold list of reqests from backend
 
   const [name, setName] = useState("");
-  const [helpType, setHelpType] = useState("");
 
   //for ux - show loading spinner, and error message if api call fails
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+
+  const [categories, setCategories] = useState([]); //for dropdown of categories
+  const [categoryId, setCategoryId] = useState("");
 
   //fetch ALL requests from backend
   const fetchRequests = () => {
@@ -37,19 +39,45 @@ function App() {
       })
   };
 
+  const fetchCategories = () => {
+    fetch("http://localhost:8081/categories")
+      .then((response) => {
+        if(!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        return response.json();
+      })
+      .then((data)=> {
+        setCategories(data);
+      })
+      .catch((error)=> {
+        console.error("Error fetching categories: ", error);
+        setError("Could not load categories. Please try again later.");
+      });
+  };
+
   //runs once when component loads - used to call the backend api
   useEffect(()=>{
     fetchRequests();
+    fetchCategories();
   }, []);
+
+
    
   //CREATE
   const handleSubmit = (e) =>{
     e.preventDefault();
     setError("");
+    setMessage("");
+
+    if(!categoryId) {
+      setError("Please select a category");
+      return;
+    }
 
     const newRequest = {
       name : name,
-      helpType : helpType,
+      categoryId:Number(categoryId),
       status : "Pending"
     };
 
@@ -68,8 +96,8 @@ function App() {
     })
     .then(()=>{
       setName("");  //clear form
-      setHelpType("");
       setMessage("Request created successfully!");
+      setCategoryId(""); //after creating form resets
       //reload list from backend
       fetchRequests();
     })
@@ -124,7 +152,14 @@ function App() {
           <input type="text" placeholder="Name" value={name} onChange={(e)=> setName(e.target.value)} required />
         </div>
         <div>
-          <input type="text" placeholder="Help Type" value={helpType} onChange= {(e)=> setHelpType(e.target.value)} required />
+          <select value={categoryId} onChange = {(e) => setCategoryId(e.target.value)} required>
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
         <button type="submit" disabled={loading}>
           {loading ? "Please wait..." : "Create Request"}
@@ -138,8 +173,8 @@ function App() {
         <ul>
           {requests.map((req)=> ( //loop over array, show each helpRequest on page
             <li key={req.id}>
-              <strong>{req.name}</strong> - {req.helpType} - {req.status}{" "}
-              {req.status !== "COMPLETED" && ( //show button only if status not completed
+              <strong>{req.name}</strong> - {req.category?.name} - {req.status}{" "}
+              {req.status === "OPEN" && ( //show button only if status not completed
                 <button onClick={()=> markAsCompleted(req.id)} disabled={loading}>
                   Mark As Completed
                 </button>
