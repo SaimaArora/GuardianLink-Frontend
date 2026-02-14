@@ -11,9 +11,11 @@ function App() {
   //for ux - show loading spinner, and error message if api call fails
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   //fetch ALL requests from backend
   const fetchRequests = () => {
+    setMessage("");
     setLoading(true); //start loading
     setError(""); //clear prev error
     fetch("http://localhost:8081/requests")
@@ -67,6 +69,7 @@ function App() {
     .then(()=>{
       setName("");  //clear form
       setHelpType("");
+      setMessage("Request created successfully!");
       //reload list from backend
       fetchRequests();
     })
@@ -84,6 +87,7 @@ function App() {
       if(!response.ok) {
         throw new Error("Failed to complete request");
       }
+      setMessage("Request marked as completed!");
       fetchRequests(); //reload list after update
     })
     .catch((error)=>{
@@ -100,6 +104,7 @@ function App() {
       if(!response.ok) {
         throw new Error("Failed to delete the request. Please try later.");
       }
+      setMessage("Request deleted successfully");
       fetchRequests(); //reload after delete
     })
     .catch((error)=>{
@@ -113,6 +118,7 @@ function App() {
       <h1>Guardian Link</h1>
       <h2> Help Request</h2>
       {error && <p style={{color:"red"}} >{error}</p>}
+      {message && <p style={{ color: "green"}}>{message}</p>}
       <form onSubmit={handleSubmit}>
         <div>
           <input type="text" placeholder="Name" value={name} onChange={(e)=> setName(e.target.value)} required />
@@ -120,7 +126,9 @@ function App() {
         <div>
           <input type="text" placeholder="Help Type" value={helpType} onChange= {(e)=> setHelpType(e.target.value)} required />
         </div>
-        <button type="submit">Create Request</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Please wait..." : "Create Request"}
+        </button>
       </form>
       <hr/>
       <h2>Help Requests</h2>
@@ -132,11 +140,11 @@ function App() {
             <li key={req.id}>
               <strong>{req.name}</strong> - {req.helpType} - {req.status}{" "}
               {req.status !== "COMPLETED" && ( //show button only if status not completed
-                <button onClick={()=> markAsCompleted(req.id)}>
+                <button onClick={()=> markAsCompleted(req.id)} disabled={loading}>
                   Mark As Completed
                 </button>
               )}{" "}
-              <button onClick={()=>deleteRequest(req.id)}>
+              <button onClick={()=>deleteRequest(req.id)} disabled = {loading}>
                 Delete
               </button>
             </li>
