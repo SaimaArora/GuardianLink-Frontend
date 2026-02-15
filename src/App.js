@@ -15,6 +15,9 @@ function App() {
   const [categories, setCategories] = useState([]); //for dropdown of categories
   const [categoryId, setCategoryId] = useState("");
 
+  const [users, setUsers] = useState([]);
+  const [userId, setUserId] = useState("");
+
   //fetch ALL requests from backend
   const fetchRequests = () => {
     setMessage("");
@@ -56,10 +59,28 @@ function App() {
       });
   };
 
+  const fetchUsers = () => {
+    fetch("http://localhost:8081/users")
+      .then((response) => {
+        if(!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        return response.json();
+      })
+      .then((data)=> {
+        setUsers(data);
+      })
+      .catch((error)=> {
+        console.error("Error fetching users: ", error);
+        setError("Could not load users. Please try again later.");
+      });
+  };
+
   //runs once when component loads - used to call the backend api
   useEffect(()=>{
     fetchRequests();
     fetchCategories();
+    fetchUsers();
   }, []);
 
 
@@ -74,10 +95,15 @@ function App() {
       setError("Please select a category");
       return;
     }
+    if (!userId) {
+      setError("Please select a user");
+      return;
+    }
 
     const newRequest = {
       name : name,
       categoryId:Number(categoryId),
+      userId:Number(userId),
       status : "Pending"
     };
 
@@ -98,6 +124,7 @@ function App() {
       setName("");  //clear form
       setMessage("Request created successfully!");
       setCategoryId(""); //after creating form resets
+      setUserId("");
       //reload list from backend
       fetchRequests();
     })
@@ -152,6 +179,16 @@ function App() {
           <input type="text" placeholder="Name" value={name} onChange={(e)=> setName(e.target.value)} required />
         </div>
         <div>
+          <select value={userId} onChange={(e) => setUserId(e.target.value)} required>
+          <option value="">Select User</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
+            </option>
+          ))}
+          </select>
+        </div>
+        <div>
           <select value={categoryId} onChange = {(e) => setCategoryId(e.target.value)} required>
             <option value="">Select Category</option>
             {categories.map((cat) => (
@@ -173,7 +210,7 @@ function App() {
         <ul>
           {requests.map((req)=> ( //loop over array, show each helpRequest on page
             <li key={req.id}>
-              <strong>{req.name}</strong> - {req.category?.name} - {req.status}{" "}
+              <strong>{req.name}</strong> - {req.user?.name} - {req.category?.name} - {req.status}{" "}
               {req.status === "OPEN" && ( //show button only if status not completed
                 <button onClick={()=> markAsCompleted(req.id)} disabled={loading}>
                   Mark As Completed
