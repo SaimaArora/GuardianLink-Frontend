@@ -3,3 +3,19 @@ react component is just a function that returns UI
 react with nextjs ssr concepts
 be - nodejs, express, mongodb
 security - suthentication and authorization
+
+How did you structure your frontend?
+
+You can say:
+
+Dashboard handles layout
+
+RequestsList handles filtering + actions
+
+RequestCard handles single card
+
+Clean separation of concerns
+
+Role-based behavior via props
+
+Stateless rendering + controlled fetch
