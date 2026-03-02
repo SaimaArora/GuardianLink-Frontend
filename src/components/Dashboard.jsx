@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import RequestForm from "./RequestForm";
 import RequestsList from "./RequestsList";
-const role = localStorage.getItem("role");
+
 function Dashboard({token, role}) {
     const [requests, setRequests] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -31,15 +31,15 @@ function Dashboard({token, role}) {
         })
         
         .then((response) => {
-  if (response.status === 401 || response.status === 403) {
-    handleUnauthorized();
-    throw new Error("Unauthorized");
-  }
-  if (!response.ok) {
-    throw new Error("Failed to fetch requests");
-  }
-  return response.json();
-})
+            if (response.status === 401 || response.status === 403) {
+                handleUnauthorized();
+                throw new Error("Unauthorized");
+            }
+            if (!response.ok) {
+                throw new Error("Failed to fetch requests");
+            }
+            return response.json();
+        })
         .then((data)=>{
             setRequests(data);
         })
@@ -50,8 +50,8 @@ function Dashboard({token, role}) {
         .finally(()=>{
             setLoading(false);
         });
-        console.log("Fetching requests from:", endpoint);
-        console.log("Using token:", token);
+        // console.log("Fetching requests from:", endpoint);
+        // console.log("Using token:", token);
     };
     
 
@@ -80,15 +80,76 @@ function Dashboard({token, role}) {
     }, [token, viewMode, role]); //when user switch between my and all, we refetch the requests
     return(
         <div className="dashboard">
-            <h1>Dashboard</h1>
-            {role === "USER" && (<RequestForm token={token} name = {name} setName={setName} categoryId={categoryId} setCategoryId={setCategoryId} categories={categories} loading={loading} setError={setError} setMessage={setMessage} fetchRequests={fetchRequests} />)}
-            <div style={{marginBottom: "20px", display:"flex", gap:"10px"}}>
-                {role === "USER" && <button onClick={()=> setViewMode("MY")}>My Requests</button>}
-                {role === "VOLUNTEER" && <button onClick={()=> setViewMode("ALL")}>All Requests</button>}
+            {/* Dashboard Header */}
+            <div className="card">
+                <h2>
+                Welcome, {role === "VOLUNTEER" ? "Volunteer" : "User"}
+                </h2>
+                <div className="status-badge">
+                Role: {role}
                 </div>
-            <RequestsList requests={requests} loading={loading} token={token} role={role} setError={setError} setMessage={setMessage} fetchRequests={fetchRequests}/>
+            </div>
+            {/* USER SECTION */}
+            {role === "USER" && (
+                <div className="card">
+                <h2>Create Help Request</h2>
+                <RequestForm
+                    token={token}
+                    name={name}
+                    setName={setName}
+                    categoryId={categoryId}
+                    setCategoryId={setCategoryId}
+                    categories={categories}
+                    loading={loading}
+                    setError={setError}
+                    setMessage={setMessage}
+                    fetchRequests={fetchRequests}
+                />
+                </div>
+            )}
+
+            {/* VIEW MODE CONTROLS */}
+            <div className="card">
+                <div className="card-actions">
+                {role === "USER" && (
+                    <button
+                    onClick={() => setViewMode("MY")}
+                    disabled={viewMode === "MY"}
+                    >
+                    My Requests
+                    </button>
+                )}
+
+                {role === "VOLUNTEER" && (
+                    <button
+                    onClick={() => setViewMode("ALL")}
+                    disabled={viewMode === "ALL"}
+                    >
+                    All Requests
+                    </button>
+                )}
+                </div>
+            </div>
+
+            {/* REQUEST LIST */}
+            <div className="card">
+                <h2>
+                {viewMode === "MY" ? "My Requests" : "All Requests"}
+                </h2>
+
+                <RequestsList
+                requests={requests}
+                loading={loading}
+                token={token}
+                role={role}
+                setError={setError}
+                setMessage={setMessage}
+                fetchRequests={fetchRequests}
+                />
+            </div>
+
             {error && <div className="error">{error}</div>}
-            {message && <div className="message">{message}</div>}
+            {message && <div className="success">{message}</div>}
         </div>
     );
 }
