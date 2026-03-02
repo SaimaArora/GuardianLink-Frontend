@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 function RegisterForm({email, password, setEmail, setPassword, setError, setMessage, switchToLogin}) {
+    const [role, setRole] = useState("user");
+
     const handleRegister = (e) => {
         e.preventDefault();
         setError("");
@@ -11,11 +15,12 @@ function RegisterForm({email, password, setEmail, setPassword, setError, setMess
             body: JSON.stringify({
                 email:email,
                 password:password,
-                name:email.split("@")[0]
+                name:email.split("@")[0],
+                role:role,
             }),
         })
         .then(async (res) => {
-            const text = await res.text();
+            const data = await res.json();
             if (!res.ok) {
                 throw new Error(text || "Registration failed");
             }
@@ -31,11 +36,15 @@ function RegisterForm({email, password, setEmail, setPassword, setError, setMess
     };
     return(
         <>
-            <h2>Register</h2>
-            <form onSubmit={handleRegister}>
+            <h2>Create Account</h2>
+            <form onSubmit={handleRegister} className="auth-form">
                 <input type="email" placeholder="Email" value={email} onChange={(e)=> setEmail(e.target.value)} required />
                 <input type="password" placeholder="Password" value={password} onChange={(e)=> setPassword(e.target.value)} required />
-                <button type="submit">Register</button>
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                    <option value="USER">User (Request Help)</option>
+                    <option value="VOLUNTEER">Volunteer (Provide Help)</option>
+                </select>
+                <button type="submit" className="primary-btn">Register</button>
             </form>
             <p>
                 Already have an account? {" "}
