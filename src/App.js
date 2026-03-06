@@ -14,10 +14,21 @@ function App() {
     };
     return (
         <div className="app-container">
-            <header>
+            <header className="card">
                 <h1>Guardian Link</h1>
-                {token && <button onClick={handleLogout}>Logout</button>}
-            </header>
+
+                {token && (
+                    <div style={{display:"flex", gap:"10px", alignItems:"center"}}>
+                    <span className="status-badge open">
+                        {role}
+                    </span>
+
+                    <button className="danger" onClick={handleLogout}>
+                        Logout
+                    </button>
+                    </div>
+                )}
+                </header>
             {!token ? (
                 <AuthPage setToken={setToken} setRole={setRole} />
             ) : (

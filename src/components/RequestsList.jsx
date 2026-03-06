@@ -106,11 +106,11 @@ function RequestsList({
       </div>
 
       {/* Loading State */}
-      {loading && <p>Loading requests...</p>}
+      {loading && <p style={{opacity:0.7}}>Loading requests...</p>}
 
       {/* Empty State */}
       {!loading && filteredRequests.length === 0 && (
-        <p>
+        <p style={{opacity:0.7}}>
           {role === "USER"
             ? "You haven't created any requests yet."
             : "No requests available for this filter."}

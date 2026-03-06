@@ -261,3 +261,7 @@ button:disabled {
 .card-actions button {
   flex: 1;
 }
+.status-badge.inprogress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
