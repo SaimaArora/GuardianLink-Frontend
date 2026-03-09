@@ -11,18 +11,29 @@ function Dashboard({token, role}) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [viewMode, setViewMode] = useState(role==="VOLUNTEER"?"ALL" : "MY"); // "MY" or "ALL"
-
+    const email = localStorage.getItem("email");
+    const userName = email ? email.split("@")[0] : "User";
     const handleUnauthorized = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
   window.location.reload();
 };
+
+    const openCount = requests.filter(req => req.status === "OPEN").length;
+    const progressCount = requests.filter(req => req.status === "IN_PROGRESS").length;
+    const completedCount = requests.filter(req => req.status === "COMPLETED").length;
     const fetchRequests = () => {
         setMessage("");
         setLoading(true);
         setError("");
-        const endpoint = viewMode === "MY" ? "http://localhost:8081/requests/my" : "http://localhost:8081/requests";
 
+        let endpoint = "http://localhost:8081/requests";
+        if (viewMode === "MY") {
+            endpoint = "http://localhost:8081/requests/my";
+        }
+        if(viewMode === "ASSIGNED") {
+            endpoint = "http://localhost:8081/requests/assigned";
+        }
         fetch(endpoint, {
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -41,7 +52,7 @@ function Dashboard({token, role}) {
             return response.json();
         })
         .then((data)=>{
-            setRequests(data);
+            setRequests(data.data || []);
         })
         .catch((error)=>{
             console.error("Error fetching requests:", error);
@@ -83,11 +94,12 @@ function Dashboard({token, role}) {
             {/* Dashboard Header */}
             <div className="card">
                 <h2>
-                Welcome, {role === "VOLUNTEER" ? "Volunteer" : "User"}
+                Welcome back {userName}!
                 </h2>
-                <div className="status-badge">
-                Role: {role}
-                </div>
+
+                {/* <p style={{opacity:0.7}}>
+                You are logged in as <strong>{role}</strong>
+                </p> */}
             </div>
             {/* USER SECTION */}
             {role === "USER" && (
@@ -107,34 +119,53 @@ function Dashboard({token, role}) {
                 />
                 </div>
             )}
+    {/* stats count */}
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <span>Open</span>
+                    <h3>{openCount}</h3>
+                </div>
+                <div className="stat-card">
+                    <span>In Progress</span>
+                    <h3>{progressCount}</h3>
+                </div>
+                <div className="stat-card">
+                    <span>Completed</span>
+                    <h3>{completedCount}</h3>
+                </div>
+            </div>
 
             {/* VIEW MODE CONTROLS */}
-            <div className="card">
+            {role === "VOLUNTEER" && (<div className="card">
                 <div className="card-actions">
-                {role === "USER" && (
-                    <button
-                    onClick={() => setViewMode("MY")}
-                    disabled={viewMode === "MY"}
-                    >
-                    My Requests
-                    </button>
-                )}
 
                 {role === "VOLUNTEER" && (
-                    <button
-                    onClick={() => setViewMode("ALL")}
-                    disabled={viewMode === "ALL"}
-                    >
-                    All Requests
-                    </button>
+                    <>
+                        <button
+                            onClick={() => setViewMode("ALL")}
+                            disabled={viewMode === "ALL"}
+                        >
+                            All Requests
+                        </button>
+
+                        <button
+                            onClick={() => setViewMode("ASSIGNED")}
+                            disabled={viewMode === "ASSIGNED"}
+                        >
+                            My Assigned Requests
+                        </button>
+                    </>
                 )}
                 </div>
             </div>
+            )}
 
             {/* REQUEST LIST */}
             <div className="card">
                 <h2>
-                {viewMode === "MY" ? "My Requests" : "All Requests"}
+                    {viewMode === "MY" && "My Requests"}
+                    {viewMode === "ALL" && "All Requests"}
+                    {viewMode === "ASSIGNED" && "My Assigned Requests"}
                 </h2>
 
                 <RequestsList

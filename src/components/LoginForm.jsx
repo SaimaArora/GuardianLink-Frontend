@@ -16,19 +16,24 @@ function LoginForm({
                 password:password, }),
             })
         .then(async (res) => {
+            const data = await res.json();
+
             if (!res.ok) {
-                throw new Error("Login failed");
+                throw new Error(data.message || "Login failed");
             }
-            return res.json(); 
-        })
-        .then((data) => {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("role", data.role);
-            setToken(data.token);
-            setRole(data.role);
-            setEmail("");
-            setPassword("");
+
+            const token = data.data.token;
+            const role = data.data.role;
+
+            localStorage.setItem("token", token);
+            localStorage.setItem("role", role);
+            localStorage.setItem("email", email);
+console.log(data);
+            setToken(token);
+            setRole(role);
+
             setMessage("Login successful!");
+            
         })
         .catch((err) => {
             console.error("Login error:", err);
@@ -38,6 +43,7 @@ function LoginForm({
 };
 return(
     <>
+    
         <h2>Login</h2>
         <form onSubmit={handleLogin}>
             <input type="email" placeholder="Email" value={email} onChange={(e)=> setEmail(e.target.value)} required />

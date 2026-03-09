@@ -7,7 +7,7 @@ function RequestsList({
     const [statusFilter, setStatusFilter] = useState("ALL"); //all, open, inprogress, completed
     
     const handleUnauthorized = () => {
-        localStorgae.removeItem("token");
+        localStorage.removeItem("token");
         localStorage.removeItem("role");
         window.location.reload();
     }
@@ -106,15 +106,22 @@ function RequestsList({
       </div>
 
       {/* Loading State */}
-      {loading && <p style={{opacity:0.7}}>Loading requests...</p>}
+      {loading && (
+        <div className="loading-container">
+            <div className="spinner"></div>
+        </div>
+      )}
 
       {/* Empty State */}
       {!loading && filteredRequests.length === 0 && (
-        <p style={{opacity:0.7}}>
-          {role === "USER"
-            ? "You haven't created any requests yet."
-            : "No requests available for this filter."}
-        </p>
+        <div className="empty-state">
+            <h3>No Requests Yet</h3>
+            <p>
+            {role === "USER"
+                ? "Create your first help request to get assistance."
+                : "No help requests available right now."}
+            </p>
+        </div>
       )}
 
       {/* Requests Grid */}

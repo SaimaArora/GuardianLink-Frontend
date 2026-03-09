@@ -1,12 +1,18 @@
 import { useState } from "react";
 
 function RegisterForm({email, password, setEmail, setPassword, setError, setMessage, switchToLogin}) {
-    const [role, setRole] = useState("user");
+    const [role, setRole] = useState("USER");
 
     const handleRegister = (e) => {
         e.preventDefault();
         setError("");
         setMessage("");
+        console.log({
+  email: email,
+  password: password,
+  name: email.split("@")[0],
+  role: role
+});
         fetch("http://localhost:8081/auth/register", {
             method: "POST",
             headers: {
@@ -22,7 +28,9 @@ function RegisterForm({email, password, setEmail, setPassword, setError, setMess
         .then(async (res) => {
             const data = await res.json();
             if (!res.ok) {
-                throw new Error(text || "Registration failed");
+                throw new Error(data.errors
+    ? Object.values(data.errors).join(", ")
+    : data.message || "Registration failed");
             }
             setMessage("Registration successful! Please log in.");
             switchToLogin();
