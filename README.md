@@ -1,89 +1,120 @@
-🛡️ Guardian Link
+🛡️ GuardianLink
 
-Guardian Link is a simple help-request platform where users can create help requests and volunteers can claim and complete them.
-It demonstrates a real-world workflow using React + Spring Boot + JWT authentication.
+**GuardianLink** is a full-stack web application that connects people who need help with volunteers who can assist them.  
+Users can create help requests, while volunteers can claim and complete those requests through a role-based dashboard.
 
+The platform demonstrates secure authentication, REST API design, and a clean React dashboard.
 
-🧠 Problem It Solves
+---
 
-Sometimes people need help with small tasks or issues.
-This app lets:
+# 🚀 Features
 
-👤 Users create help requests
+✅ **JWT Authentication**  
+Secure login and registration using JSON Web Tokens.
 
-🧑‍🚒 Volunteers view open requests, claim them, and mark them as completed
-So help requests don’t get lost, and responsibility is clearly assigned.
+👥 **Role-Based Access Control**  
+Separate dashboards for **Users** and **Volunteers**.
 
+📌 **Help Request Management**
+- Users can create help requests
+- Volunteers can claim requests
+- Volunteers can mark requests as completed
 
-👥 Roles
-
-USER
--> Can register & log in
--> Can create help requests
--> Can view only their own requests
--> Can delete their own requests
-
-VOLUNTEER
--> Can register & log in
--> Can view all open requests
--> Can claim a request
--> Can complete only the requests they claimed
+🔄 **Request Status Tracking**
+- OPEN → IN_PROGRESS → COMPLETED
 
 
-🔁 Workflow
-User registers and logs in
-User creates a help request (title + category)
-Volunteer logs in
-Volunteer sees open requests
-Volunteer claims a request → status becomes IN_PROGRESS
-Volunteer completes the request → status becomes COMPLETED
+📊 **Dashboard Interface**
+- Request statistics
+- Request filtering
+- Volunteer assignment view
+
+📱 **Responsive UI**
+Mobile-friendly dashboard built with React.
+
+---
+
+# 🛠️ Tech Stack
+
+### Backend
+- Java
+- Spring Boot
+- Spring Security
+- JWT Authentication
+- Spring Data JPA
+- MySQL
+
+### Frontend
+- React.js
+- Fetch API
+- CSS
+
+---
+
+# 🏗️ Architecture
+
+The backend follows a **layered architecture** for clean separation of concerns.
 
 
-🛠️ Tech Stack
+Controller → Service → Repository → Database
 
-Backend
-Java Spring Boot
-Spring Security
-JWT Authentication
-MySQL
-JPA / Hibernate
 
-Frontend
-React
-Fetch API
-CSS (custom UI)
+### Request Flow
 
-⚙️ How to Run the Project
+1️⃣ User interacts with **React UI**  
+2️⃣ React sends request to **Spring Boot REST API**  
+3️⃣ Controller processes the request  
+4️⃣ Service contains business logic  
+5️⃣ Repository interacts with **MySQL database**
 
-✅ Backend (Spring Boot)
-Open the backend project in IntelliJ / VS Code
-Make sure MySQL is running and your DB config is correct in application.properties
+All secured routes are protected using **JWT authentication via Spring Security filters**.
 
-Run:
+---
+
+# ⚙️ Core Functional Flow
+
+### 👤 User Flow
+1. Register / Login
+2. Create help request
+3. Track request status
+
+### 🙋 Volunteer Flow
+1. Login as volunteer
+2. View available requests
+3. Claim a request
+4. Mark request as completed
+
+---
+
+# 🔗 API Overview
+
+| Method | Endpoint | Description |
+|------|------|------|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login and receive JWT |
+| GET | `/requests` | View all requests |
+| GET | `/requests/my` | View user's requests |
+| GET | `/requests/assigned` | View volunteer assigned requests |
+| POST | `/requests` | Create new help request |
+| PUT | `/requests/{id}/claim` | Volunteer claims request |
+| PUT | `/requests/{id}/complete` | Mark request completed |
+| DELETE | `/requests/{id}` | Delete request |
+
+---
+
+# ▶️ Running the Project
+
+### 1️⃣ Start Backend
+
+bash
+cd backend
 mvn spring-boot:run
-or run GuardianLinkApplication.java from your IDE.
-
-Backend will start at:
+Backend runs on:
 http://localhost:8081
 
-✅ Frontend (React)
-Open the frontend folder
-Install dependencies:
+### 2️⃣ Start Frontend
+cd frontend
 npm install
-Start the app:
 npm start
-Frontend will run at:
+Frontend runs on:
 http://localhost:3000
-
-
-✅ Features
-🔐 JWT-based authentication
-👥 Two roles: USER and VOLUNTEER
-📝 Create help requests (USER)
-👀 View requests (role-based)
-🏷️ Categorized requests
-🙋 Volunteer can claim requests
-🔄 Request status flow: OPEN → IN_PROGRESS → COMPLETED
-🔒 Only assigned volunteer can complete a request
-🗑️ Users can delete their own requests
-🎨 Clean, simple, user-friendly UI
